@@ -99,7 +99,6 @@ class UserPage extends MaterialPage {
 
 void main() {
   final myApp = MaterialApp(
-    // navigatorKey: router.navigationKey,
     home: PagesNavigator(pagesRouter: router)
   );
   testWidgets('Pages navigator text', (WidgetTester tester) async {
@@ -130,7 +129,8 @@ void main() {
     
      // route back to users
     router.navigationKey.currentState.pop();
-    await tester.pump();
+    await tester.pump(Duration(seconds: 1));
+  
     expect(find.text('User$userId1'), findsOneWidget);
     expect(find.text('User$userId2'), findsOneWidget);
     expect(find.text('User$userId3'), findsOneWidget);
@@ -144,7 +144,7 @@ void main() {
 
     // route back to users
     router.navigationKey.currentState.pop();
-    await tester.pump();
+    await tester.pump(Duration(seconds: 1));
     expect(find.text('User$userId1'), findsOneWidget);
     expect(find.text('User$userId2'), findsOneWidget);
     expect(find.text('User$userId3'), findsOneWidget);
@@ -158,7 +158,7 @@ void main() {
 
     // route back to users
     router.navigationKey.currentState.pop();
-    await tester.pump();
+    await tester.pump(Duration(seconds: 1));
     expect("users", router.currentRoute.name);
 
     // route back to root

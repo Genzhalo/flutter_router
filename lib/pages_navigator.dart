@@ -98,7 +98,6 @@ class PagesRouter extends ChangeNotifier {
 
   bool _onPopPage(Route page, result) {
     goByPath(_findPath() ?? "/");
-    page.didPop(result);
     return false;
   }
 
