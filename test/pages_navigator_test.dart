@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pages_router/pages_navigator.dart';
 import 'package:pages_router/router_defenition.dart';
-import 'package:pages_router/router_page.dart';
 
 final router = PagesRouter(
     initialPath: "/",
@@ -42,7 +41,7 @@ class RootWidget extends StatelessWidget {
       appBar: AppBar(title: Text("Root"),),
       body: IconButton(
         icon: Icon(Icons.people),
-        onPressed: (){ router.goByName("users");} ,
+        onPressed: (){ router.goByName("users"); } ,
       )
     );
   }
@@ -85,23 +84,17 @@ class UserWidget extends StatelessWidget {
   }
 }
 
-class RootPage extends RoutePage {
+class RootPage extends MaterialPage {
   RootPage() : super(child: RootWidget());
-  @override
-  String get fragment => "/";
 }
 
-class UsersPage extends RoutePage {
+class UsersPage extends MaterialPage {
   UsersPage() : super(child: UsersWidget());
-  @override
-  String get fragment => "users";
 }
 
-class UserPage extends RoutePage {
+class UserPage extends MaterialPage {
   final String userId;
   UserPage({ this.userId }) : super(child: UserWidget(userId: userId));
-  @override
-  String get fragment => userId;
 }
 
 void main() {

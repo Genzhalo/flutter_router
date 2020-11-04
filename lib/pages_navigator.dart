@@ -3,7 +3,6 @@ library pages_router;
 import 'package:flutter/material.dart';
 import 'package:pages_router/router_data.dart';
 import 'package:pages_router/router_defenition.dart';
-import 'package:pages_router/router_page.dart';
 
 class PagesNavigator extends StatefulWidget {
   final PagesRouter pagesRouter;
@@ -21,7 +20,7 @@ class _State extends State<PagesNavigator> {
 
   @override
   void dispose() {
-     widget.pagesRouter.removeListener(_rebuild);
+    widget.pagesRouter.removeListener(_rebuild);
     super.dispose();
   }
 
@@ -48,8 +47,8 @@ class PagesRouter extends ChangeNotifier {
     goByPath(initialPath);
   }
 
-  List<RoutePage> _pages = [];
-  List<RoutePage> get pages => _pages;
+  List<Page> _pages = [];
+  List<Page> get pages => _pages;
 
   RouteData _currentRoute;
   RouteData get currentRoute => _currentRoute;
@@ -62,7 +61,7 @@ class PagesRouter extends ChangeNotifier {
     return route != null ? route : routes.firstWhere((route) => route.name == "unknown");
   }
 
-  void goByName(String name, { Map<String, String> arguments = const {},  Map<String, String> query = const {} }) {
+  void goByName(String name, { Map<String, String> arguments = const {},  Map<String, dynamic> query = const {} }) {
     final route = findRoute((route) => route.name == name);
     _currentRoute = RouteData.create(
       name: name, 
@@ -98,12 +97,25 @@ class PagesRouter extends ChangeNotifier {
   }
 
   bool _onPopPage(Route page, result) {
-    _pages.removeLast();
-    final path = pages
-      .map((p) => p.fragment)
-      .join("/")
-      .replaceAll("//", "/");
-    goByPath(path);
-    return page.didPop(result);
+    goByPath(_findPath() ?? "/");
+    page.didPop(result);
+    return false;
+  }
+
+  String _findPath(){
+    final uri = Uri.parse(currentRoute.path);
+    List<String> segments = uri.pathSegments.toList();
+    String path;
+    while (!(segments.isEmpty || path != null)) {
+      segments.removeLast();
+      path = "/" + segments.join("/");
+      routes.firstWhere(
+        (route) => route.hasMatch(path), 
+        orElse: () {
+          path = null;
+        }
+      );
+    } 
+    return path == null ? path : uri.query.isEmpty ? path : "$path?${uri.query}" ;
   }
 }

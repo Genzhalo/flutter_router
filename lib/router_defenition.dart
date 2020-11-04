@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:pages_router/router_data.dart';
-import 'package:pages_router/router_page.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 class RouteDefinition {
   final String path;
   final String name;
-  final List<RoutePage> Function(RouteData) handler;
+  final List<Page> Function(RouteData) handler;
   List<String> _parameters = [];
   RegExp _pathRegExp;
 
