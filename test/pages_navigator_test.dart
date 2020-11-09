@@ -1,36 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pages_router/pages_navigator.dart';
-import 'package:pages_router/router_defenition.dart';
+import 'package:pages_router/route_defenition.dart';
+
 
 final router = PagesRouter(
     initialPath: "/",
     navigationKey: GlobalKey<NavigatorState>(),
     routes: [
       RouteDefinition(
-        path: "/", 
+        segment: "/welcome", 
+        name: "welcome",
+        getPages: (_) => [ RootPage() ],
+      ),
+      RouteDefinition(
+        segment: "/", 
         name: "root",
-        handler: (_) => [ RootPage() ]
-      ),
-      RouteDefinition(
-        path: "/users", 
-        name: "users", 
-        handler: (_) => [ 
-          RootPage(),
-          UsersPage()
-        ], 
-      ),
-      RouteDefinition(
-        path: "/users/:userId", 
-        name: "user",
-        handler: (data) => [
-          RootPage(),
-          UsersPage(),
-          UserPage(userId: data.params["userId"])
+        getPages: (_) => [ RootPage() ],
+        routes: [ 
+          RouteDefinition(
+            segment: "/users", 
+            name: "users", 
+            getPages: (_) => [ 
+              UsersPage()
+            ], 
+            routes: [
+              RouteDefinition(
+                name: "usersAbout", 
+                segment: "/about", 
+                getPages: (_) => [
+
+                ]
+              ),
+              RouteDefinition(
+                segment: "/:userId", 
+                name: "user",
+                getPages: (data) => [
+                  UserPage(userId: data.params["userId"])
+                ],
+                routes: [
+                  RouteDefinition(
+                    segment: "/stories", 
+                    getPages: (_) => [], 
+                    name: "userStrories",
+                    routes: [
+                      RouteDefinition(
+                        segment: "/:stotyId",
+                        getPages: (_) => [], 
+                        name: "userStrory"
+                      ),
+                    ]
+                  ),
+                ]
+              ),
+            ]
+          ), 
         ]
-      ),
-      RouteDefinition(path: "/users/:userId/stories", handler: (_) => [], name: "userStrories"),
-      RouteDefinition(path: "/users/:userId/stories/:stotyId", handler: (_) => [], name: "userStrory"),
+      )
     ]
   );
 
@@ -129,7 +155,7 @@ void main() {
     
      // route back to users
     router.navigationKey.currentState.pop();
-    await tester.pump(Duration(seconds: 1));
+    await tester.pump();
   
     expect(find.text('User$userId1'), findsOneWidget);
     expect(find.text('User$userId2'), findsOneWidget);
@@ -144,7 +170,7 @@ void main() {
 
     // route back to users
     router.navigationKey.currentState.pop();
-    await tester.pump(Duration(seconds: 1));
+    await tester.pump();
     expect(find.text('User$userId1'), findsOneWidget);
     expect(find.text('User$userId2'), findsOneWidget);
     expect(find.text('User$userId3'), findsOneWidget);
@@ -165,5 +191,26 @@ void main() {
     router.navigationKey.currentState.pop();
     await tester.pump();
     expect("root", router.currentRoute.name);
+
+    router.navigationKey.currentState.pop();
+    await tester.pump();
+    expect("root", router.currentRoute.name);
+
+    router.navigationKey.currentState.pop();
+    await tester.pump();
+    expect("root", router.currentRoute.name);
+    
+    router.navigationKey.currentState.pop();
+    await tester.pump();
+    expect("root", router.currentRoute.name);
+
+    router.goByName("welcome");
+    await tester.pump();
+    expect("welcome", router.currentRoute.name);
+
+    router.navigationKey.currentState.pop();
+    await tester.pump();
+    expect("welcome", router.currentRoute.name);
+
   });
 }

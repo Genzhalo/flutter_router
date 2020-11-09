@@ -1,8 +1,9 @@
 library pages_router;
 
 import 'package:flutter/material.dart';
-import 'package:pages_router/router_data.dart';
-import 'package:pages_router/router_defenition.dart';
+import 'package:pages_router/route-path.dart';
+import 'package:pages_router/route_data.dart';
+import 'package:pages_router/route_defenition.dart';
 
 class PagesNavigator extends StatefulWidget {
   final PagesRouter pagesRouter;
@@ -33,88 +34,92 @@ class _State extends State<PagesNavigator> {
     return Navigator(
       key: widget.pagesRouter.navigationKey,
       pages: widget.pagesRouter.pages,
-      onPopPage: widget.pagesRouter._onPopPage
+      onPopPage: widget.pagesRouter.onPopPage
     );
   } 
 }
 
 class PagesRouter extends ChangeNotifier {
   final GlobalKey<NavigatorState> navigationKey;
-  final List<RouteDefinition> routes;
   final String initialPath;
+  List<RoutePath> _routes = [];
 
-  PagesRouter({  @required this.navigationKey, this.routes = const [], this.initialPath = "/" }) {
+  PagesRouter({ @required this.navigationKey, @required this.initialPath, List<RouteDefinition> routes = const [] }) {
+    _initRoutes(null ,routes);
     goByPath(initialPath);
   }
 
   List<Page> _pages = [];
   List<Page> get pages => _pages;
 
-  RouteData _currentRoute;
-  RouteData get currentRoute => _currentRoute;
-
-  RouteDefinition findRoute(bool Function(RouteDefinition) predicate){
-    var route = routes.firstWhere(
-      (route) => predicate(route),
-      orElse: () => null
-    );
-    return route != null ? route : routes.firstWhere((route) => route.name == "unknown");
-  }
+  RouteEntry _currentRoute;
+  RouteEntry get currentRoute => _currentRoute;
 
   void goByName(String name, { Map<String, String> arguments = const {},  Map<String, dynamic> query = const {} }) {
-    final route = findRoute((route) => route.name == name);
-    _currentRoute = RouteData.create(
+    final route = _findRoute((route) => route.name == name);
+    _currentRoute = RouteEntry.create(
       name: name, 
       params: arguments, 
       query: query, 
       path: route.toPath(arguments)
     );
-    _pages = route.handler(_currentRoute); 
-    notifyListeners();
+    _go(route);
   }
 
   void goByPath(String path) {
     final uri = Uri.parse(path);
     final uriPath = uri.path.trim();
-    final route = routes.firstWhere(
+    final route = _routes.firstWhere(
       (route) => route.path == uriPath, 
-      orElse: () => findRoute((route) => route.hasMatch(uriPath))
+      orElse: () => _findRoute((route) => route.hasMatch(uriPath))
     );
-    _currentRoute = RouteData.create(
+    _currentRoute = RouteEntry.create(
       name: route.name, 
       params: route.getParams(uriPath), 
       query: uri.queryParameters, 
       path: uri.path
     );
-    _pages = route.handler(_currentRoute); 
-    notifyListeners();
+    _go(route);
+  }
+
+  bool onPopPage(Route page, result) {
+    final route = _findRoute((r) => r.name == currentRoute.name);
+    if (route == null || route.parent == null) return false;
+    goByName(route.parent.name, arguments: currentRoute.params, query: currentRoute.query);
+    return page.didPop(result);
   }
 
   @override
   void dispose() {
-    routes.clear();
+    _routes.clear();
     super.dispose();
   }
 
-  bool _onPopPage(Route page, result) {
-    goByPath(_findPath() ?? "/");
-    return false;
+  void _go(RoutePath routeDefinition){
+    _pages = routeDefinition.handler(currentRoute); 
+    notifyListeners();
   }
 
-  String _findPath(){
-    final uri = Uri.parse(currentRoute.path);
-    List<String> segments = uri.pathSegments.toList();
-    String path;
-    while (!(segments.isEmpty || path != null)) {
-      segments.removeLast();
-      path = "/" + segments.join("/");
-      routes.firstWhere(
-        (route) => route.hasMatch(path), 
-        orElse: () {
-          path = null;
-        }
+
+  RoutePath _findRoute(bool Function(RoutePath) predicate){
+    var route = _routes.firstWhere(
+      (route) => predicate(route),
+      orElse: () => null
+    );
+    return route != null ? route : _routes.firstWhere((route) => route.name == "unknown");
+  }
+
+
+  void _initRoutes(RoutePath parent, List<RouteDefinition> routes){
+    for (var route in routes) {
+      final path = RoutePath(
+        name: route.name, 
+        path: ((parent?.path ?? "") + route.segment).replaceAll("//", "/"),
+        handler: (data) => (parent?.handler(data) ?? [])..addAll(route.getPages(data)),
+        parent: parent
       );
-    } 
-    return path == null ? path : uri.query.isEmpty ? path : "$path?${uri.query}" ;
+      _routes.add(path);
+      _initRoutes(path, route.routes);
+    }
   }
 }
