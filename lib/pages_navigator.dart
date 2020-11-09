@@ -42,6 +42,7 @@ class _State extends State<PagesNavigator> {
 class PagesRouter extends ChangeNotifier {
   final GlobalKey<NavigatorState> navigationKey;
   final String initialPath;
+  
   List<RoutePath> _routes = [];
 
   PagesRouter({ @required this.navigationKey, @required this.initialPath, List<RouteDefinition> routes = const [] }) {
@@ -57,12 +58,11 @@ class PagesRouter extends ChangeNotifier {
 
   void goByName(String name, { Map<String, String> arguments = const {},  Map<String, dynamic> query = const {} }) {
     final route = _findRoute((route) => route.name == name);
-    _currentRoute = RouteEntry.create(
-      name: name, 
-      params: arguments, 
-      query: query, 
-      path: route.toPath(arguments)
+    final uri = Uri(
+      path: route.toPath(arguments),
+      queryParameters: query
     );
+    _currentRoute = RouteEntry(uri: uri, routePath: route);
     _go(route);
   }
 
@@ -73,12 +73,7 @@ class PagesRouter extends ChangeNotifier {
       (route) => route.path == uriPath, 
       orElse: () => _findRoute((route) => route.hasMatch(uriPath))
     );
-    _currentRoute = RouteEntry.create(
-      name: route.name, 
-      params: route.getParams(uriPath), 
-      query: uri.queryParameters, 
-      path: uri.path
-    );
+    _currentRoute = RouteEntry(uri: uri, routePath: route);
     _go(route);
   }
 

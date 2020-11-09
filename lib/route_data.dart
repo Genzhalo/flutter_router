@@ -1,23 +1,18 @@
+import 'package:flutter/cupertino.dart';
+import 'package:pages_router/route-path.dart';
+
 class RouteEntry {
-  final Map<String, dynamic> params;
-  final Map<String, dynamic> query;
-  final String path;
-  final String name;
-  RouteEntry._({ this.params, this.query, this.path, this.name });
+  final RoutePath routePath;
+  final Uri uri;
 
-  factory RouteEntry.create({ 
-    String name, 
-    String path, 
-    Map<String, dynamic> params = const {}, 
-    Map<String, dynamic> query = const {}
-  }){
-    return RouteEntry._(
-      name: name,
-      query: query,
-      params: params,
-      path: path, 
-    );
-  }
+  RouteEntry({ @required this.uri, this.routePath });
 
-  String get redirectTo => query.containsKey("redirectTo") ? query["redirectTo"] : null;
+  String get path => uri.path;
+
+  String get name => routePath.name;
+
+  Map<String, dynamic> get params => routePath.getParams(path);
+
+  Map<String, dynamic> get query => uri.queryParameters;
+
 }

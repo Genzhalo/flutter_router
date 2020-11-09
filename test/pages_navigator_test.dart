@@ -3,60 +3,129 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pages_router/pages_navigator.dart';
 import 'package:pages_router/route_defenition.dart';
 
+class WelcomRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(RouteEntry) => [ RootPage() ];
+
+  @override
+  String get name => "welcome";
+
+  @override
+  String get segment => "/welcome";
+
+}
+
+
+class RootRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(_) => [ RootPage() ];
+
+  @override
+  String get name => "root";
+
+  @override
+  String get segment => "/";
+
+  @override
+
+  List<RouteDefinition> get routes => [
+    UsersRouteDefenition(),
+    AboutRouteDefenition()
+  ];
+
+}
+
+
+class UsersRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(RouteEntry) => [ UsersPage() ];
+
+  @override
+  String get name => "users";
+
+  @override
+  String get segment => "/users";
+
+  @override
+  List<RouteDefinition> get routes => [
+    UserRouteDefenition()
+  ];
+
+}
+
+class UserRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(data) => [ UserPage(userId: data.params["userId"]) ];
+
+  @override
+  String get name => "user";
+
+  @override
+  String get segment => "/:userId";
+
+  @override
+  List<RouteDefinition> get routes => [
+    StoriesRouteDefenition()
+  ];
+
+}
+
+class StoriesRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(data) => [  ];
+
+  @override
+  String get name => "strories";
+
+  @override
+  String get segment => "/strories";
+
+  @override
+  List<RouteDefinition> get routes => [
+    StoryRouteDefenition()
+  ];
+
+
+}
+
+class StoryRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(data) => [  ];
+
+  @override
+  String get name => "story";
+
+  @override
+  String get segment => "/:storyId";
+
+}
+
+class AboutRouteDefenition extends RouteDefinition {
+
+  @override
+  List<Page> getPages(data) => [  ];
+
+  @override
+  String get name => "about";
+
+  @override
+  String get segment => "/about";
+
+}
+
 
 final router = PagesRouter(
     initialPath: "/",
     navigationKey: GlobalKey<NavigatorState>(),
     routes: [
-      RouteDefinition(
-        segment: "/welcome", 
-        name: "welcome",
-        getPages: (_) => [ RootPage() ],
-      ),
-      RouteDefinition(
-        segment: "/", 
-        name: "root",
-        getPages: (_) => [ RootPage() ],
-        routes: [ 
-          RouteDefinition(
-            segment: "/users", 
-            name: "users", 
-            getPages: (_) => [ 
-              UsersPage()
-            ], 
-            routes: [
-              RouteDefinition(
-                name: "usersAbout", 
-                segment: "/about", 
-                getPages: (_) => [
-
-                ]
-              ),
-              RouteDefinition(
-                segment: "/:userId", 
-                name: "user",
-                getPages: (data) => [
-                  UserPage(userId: data.params["userId"])
-                ],
-                routes: [
-                  RouteDefinition(
-                    segment: "/stories", 
-                    getPages: (_) => [], 
-                    name: "userStrories",
-                    routes: [
-                      RouteDefinition(
-                        segment: "/:stotyId",
-                        getPages: (_) => [], 
-                        name: "userStrory"
-                      ),
-                    ]
-                  ),
-                ]
-              ),
-            ]
-          ), 
-        ]
-      )
+      WelcomRouteDefenition(),
+      RootRouteDefenition()
     ]
   );
 
@@ -135,7 +204,6 @@ void main() {
     expect(find.text('Root'), findsOneWidget);
     expect(find.text('1'), findsNothing);
     expect("root", router.currentRoute.name);
-
 
     // route to users
     await tester.tap(find.byIcon(Icons.people));
