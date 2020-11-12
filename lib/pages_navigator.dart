@@ -107,12 +107,7 @@ class PagesRouter extends ChangeNotifier {
 
   void _initRoutes(RoutePath parent, List<RouteDefinition> routes){
     for (var route in routes) {
-      final path = RoutePath(
-        name: route.name, 
-        path: ((parent?.path ?? "") + route.segment).replaceAll("//", "/"),
-        handler: (data) => (parent?.handler(data) ?? [])..addAll(route.getPages(data)),
-        parent: parent
-      );
+      final path = RoutePath(parent: parent, routeDefinition: route);
       _routes.add(path);
       _initRoutes(path, route.routes);
     }
