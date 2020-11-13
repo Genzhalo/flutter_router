@@ -4,32 +4,20 @@ import 'package:pages_router/route_defenition.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
  
 
-class _RoutePathHelper {
-  static String buildPath(RoutePath routePath) {
-    var path = "";
-    do {
-      path = routePath.routeDefinition.segment + path;
-    } while((routePath = routePath.parent) != null);
-    return path.replaceAll("//", "/");
-  }
-}
-
-
 class RoutePath  {
   final RoutePath parent;
   final RouteDefinition routeDefinition;
-  String _path;
+  final String path;
   List<String> _parameters = [];
   RegExp _pathRegExp;
 
-  RoutePath({ this.parent, @required this.routeDefinition }) {
-    _path = _RoutePathHelper.buildPath(this);
+  RoutePath({ this.parent, @required this.routeDefinition }) :
+    path = ((parent?.path ?? "") + routeDefinition.segment).replaceAll("//", "/") 
+  {
     _pathRegExp = pathToRegExp(path, parameters: _parameters);
   }
 
   String get name => routeDefinition.name;
-
-  String get path => _path;
 
   List<Page> handler(RouteEntry data){
     List<Page> pages = [];
