@@ -71,7 +71,7 @@ class PagesRouter extends ChangeNotifier {
     final uriPath = uri.path.trim();
     final route = _routes.firstWhere(
       (route) => route.path == uriPath, 
-      orElse: () => _findRoute((route) => route.hasMatch(uriPath))
+      orElse: () => _findRouteByPath(uriPath)
     );
     _currentRoute = RouteEntry(uri: uri, routePath: route);
     _go(route);
@@ -93,6 +93,25 @@ class PagesRouter extends ChangeNotifier {
   void _go(RoutePath routeDefinition){
     _pages = routeDefinition.handler(currentRoute); 
     notifyListeners();
+  }
+
+  RoutePath _findRouteByPath(String path){
+    final searchRoutes = _routes.where((route) => route.hasMatch(path)).toList();
+    if (searchRoutes.isEmpty) return _routes.firstWhere((route) => route.name == "unknown");
+    RoutePath result;
+    int prevIndexOf = -1;
+    for (var route in searchRoutes) {
+      final index = route.path.indexOf("/:");
+      if (index == -1) {
+        result = route;
+        break;
+      }
+      if (index > prevIndexOf) {
+        result = route;
+        prevIndexOf = index;
+      }
+    }
+    return result;
   }
 
 
