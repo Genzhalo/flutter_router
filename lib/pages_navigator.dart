@@ -7,7 +7,7 @@ import 'package:pages_router/route_defenition.dart';
 
 class PagesNavigator extends StatefulWidget {
   final PagesRouter pagesRouter;
-  PagesNavigator({ this.pagesRouter });
+  PagesNavigator({ this.pagesRouter, Key key }): super(key: key);
   @override
   State<StatefulWidget> createState() => _State();
 }
