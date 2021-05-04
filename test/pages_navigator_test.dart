@@ -159,7 +159,7 @@ class UsersWidget extends StatelessWidget {
           ),
           ListTile(
             title: Text("User3"),
-            onTap: () { router.goByPath("${router.currentRoute.path}/3?isText=true"); },
+            onTap: () { router.goByPath("${router.currentRoute!.path}/3?isText=true"); },
           )
         ],
       )
@@ -168,7 +168,7 @@ class UsersWidget extends StatelessWidget {
 }
 
 class UserWidget extends StatelessWidget {
-  final String userId;
+  final String? userId;
   UserWidget({ this.userId });
   @override
   Widget build(BuildContext context) {
@@ -188,7 +188,7 @@ class UsersPage extends MaterialPage {
 }
 
 class UserPage extends MaterialPage {
-  final String userId;
+  final String? userId;
   UserPage({ this.userId }) : super(child: UserWidget(userId: userId));
 }
 
@@ -203,7 +203,7 @@ void main() {
     // start with root
     expect(find.text('Root'), findsOneWidget);
     expect(find.text('1'), findsNothing);
-    expect("root", router.currentRoute.name);
+    expect("root", router.currentRoute!.name);
 
     // route to users
     await tester.tap(find.byIcon(Icons.people));
@@ -219,66 +219,66 @@ void main() {
     await tester.tap(find.text("User$userId1"));
     await tester.pump();
     expect(find.text('userId $userId1'), findsOneWidget);
-    expect("user", router.currentRoute.name);
+    expect("user", router.currentRoute!.name);
     
      // route back to users
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
   
     expect(find.text('User$userId1'), findsOneWidget);
     expect(find.text('User$userId2'), findsOneWidget);
     expect(find.text('User$userId3'), findsOneWidget);
-    expect("users", router.currentRoute.name);
+    expect("users", router.currentRoute!.name);
 
     // route to user 2
     await tester.tap(find.text("User$userId2"));
     await tester.pump();
     expect(find.text('userId $userId2'), findsOneWidget);
-    expect("user", router.currentRoute.name);
+    expect("user", router.currentRoute!.name);
 
     // route back to users
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
     expect(find.text('User$userId1'), findsOneWidget);
     expect(find.text('User$userId2'), findsOneWidget);
     expect(find.text('User$userId3'), findsOneWidget);
-    expect("users", router.currentRoute.name);
+    expect("users", router.currentRoute!.name);
 
      // route to user 3
     await tester.tap(find.text("User$userId3"));
     await tester.pump();
     expect(find.text('userId $userId3'), findsOneWidget);
-    expect("user", router.currentRoute.name);
+    expect("user", router.currentRoute!.name);
 
     // route back to users
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump(Duration(seconds: 1));
-    expect("users", router.currentRoute.name);
+    expect("users", router.currentRoute!.name);
 
     // route back to root
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
-    expect("root", router.currentRoute.name);
+    expect("root", router.currentRoute!.name);
 
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
-    expect("root", router.currentRoute.name);
+    expect("root", router.currentRoute!.name);
 
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
-    expect("root", router.currentRoute.name);
+    expect("root", router.currentRoute!.name);
     
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
-    expect("root", router.currentRoute.name);
+    expect("root", router.currentRoute!.name);
 
     router.goByName("welcome");
     await tester.pump();
-    expect("welcome", router.currentRoute.name);
+    expect("welcome", router.currentRoute!.name);
 
-    router.navigationKey.currentState.pop();
+    router.navigationKey.currentState!.pop();
     await tester.pump();
-    expect("welcome", router.currentRoute.name);
+    expect("welcome", router.currentRoute!.name);
 
   });
 }

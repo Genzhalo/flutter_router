@@ -137,10 +137,10 @@
       "name": "pages_router",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "2.10"
+      "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-05-04T16:24:33.040027Z",
+  "generated": "2021-05-04T16:26:20.078198Z",
   "generator": "pub",
   "generatorVersion": "2.12.3"
 }

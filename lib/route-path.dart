@@ -5,13 +5,13 @@ import 'package:path_to_regexp/path_to_regexp.dart';
  
 
 class RoutePath  {
-  final RoutePath parent;
+  final RoutePath? parent;
   final RouteDefinition routeDefinition;
   final String path;
   List<String> _parameters = [];
-  RegExp _pathRegExp;
+  late RegExp _pathRegExp;
 
-  RoutePath({ this.parent, @required this.routeDefinition }) :
+  RoutePath({ this.parent, required this.routeDefinition }) :
     path = ((parent?.path ?? "") + routeDefinition.segment).replaceAll("//", "/") 
   {
     _pathRegExp = pathToRegExp(path, parameters: _parameters);
@@ -21,10 +21,10 @@ class RoutePath  {
 
   List<Page> handler(RouteEntry data){
     List<Page> pages = [];
-    var routePath = this;
+    RoutePath routePath = this;
     do {
       pages.insertAll(0, routePath.routeDefinition.getPages(data));
-      routePath = routePath.parent;
+      routePath = routePath.parent!;
     } while(routePath != null);
     return pages;
   }
@@ -32,7 +32,7 @@ class RoutePath  {
   bool hasMatch(String _fragment) => _pathRegExp.hasMatch(_fragment);
 
   Map<String, dynamic> getParams(String fragment) =>
-    extract(_parameters, _pathRegExp.matchAsPrefix(fragment)); 
+    extract(_parameters, _pathRegExp.matchAsPrefix(fragment)!); 
 
   String toPath(Map<String, String> params) {
     final toPath = pathToFunction(path);
