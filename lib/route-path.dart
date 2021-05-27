@@ -24,7 +24,7 @@ class RoutePath  {
     RoutePath? routePath = this;
     do {
       pages.insertAll(0, routePath!.routeDefinition.getPages(data));
-      routePath = routePath!.parent;
+      routePath = routePath.parent;
     } while(routePath != null);
     return pages;
   }

@@ -8,7 +8,7 @@ class RouteEntry {
 
   String get path => uri.path;
 
-  String get name => routePath!.name;
+  String get name => routePath.name;
 
   Map<String, dynamic> get params => routePath.getParams(path);
 
