@@ -21,10 +21,10 @@ class RoutePath  {
 
   List<Page> handler(RouteEntry data){
     List<Page> pages = [];
-    RoutePath routePath = this;
+    RoutePath? routePath = this;
     do {
-      pages.insertAll(0, routePath.routeDefinition.getPages(data));
-      routePath = routePath.parent;
+      pages.insertAll(0, routePath!.routeDefinition.getPages(data));
+      routePath = routePath!.parent;
     } while(routePath != null);
     return pages;
   }
